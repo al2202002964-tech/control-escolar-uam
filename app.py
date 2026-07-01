@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Configuración visual de la aplicación móvil (Diseño centrado para simular app de celular)
 st.set_page_config(page_title="Control Escolar UAM", page_icon="🏫", layout="centered")
@@ -10,7 +10,7 @@ st.set_page_config(page_title="Control Escolar UAM", page_icon="🏫", layout="c
 st.title("🏫 Sistema de Administración de Bases de Datos")
 st.subheader("Proyecto Control Escolar - UAM")
 
-# Crear pestañas de navegación adaptables a pantallas táctiles
+# Crear pestañas de navegación adaptables
 tab1, tab2, tab3, tab4 = st.tabs(["📋 Iniciativa", "📺 Demostración", "📅 Cronograma", "💬 Comentarios"])
 
 # --- PESTAÑA 1: INICIATIVA ---
@@ -22,42 +22,90 @@ with tab1:
     información académica de estudiantes, profesores, materias y calificaciones de manera eficiente y segura.
     """)
     
-    st.markdown("### 🛠️ Características del Sistema:")
+    st.markdown("### 🛠️ Características del Sistema (Técnica SMART):")
     st.markdown("- **Registro:** Control automatizado de alumnos y materias.")
     st.markdown("- **Control:** Gestión transparente de calificaciones.")
     st.markdown("- **Reportes:** Consultas académicas rápidas y generación de reportes.")
-    st.markdown("- **____________________________________________________________________________________________________________________")
-    st.markdown("- **La importancia del servicio es primordial para la comunidad de los alumnos de la Universidad Autonoma Metropolitana")
 
-
-# --- PESTAÑA 2: DESARROLLO DE LA PLATAFORMA---
+# --- PESTAÑA 2: DEMOSTRACIÓN (ENLACE DE YOUTUBE) ---
 with tab2:
-    st.header("El enfoque principal del proyecto es desarrollarse conforme la metodologia PRINCE")
+    st.header("Funcionamiento de la Plataforma")
     st.write("Reproduce el video demostrativo para conocer la interfaz y operación del sistema:")
     
-    # Intenta cargar tu video local 'Sistema_UAM.mp4'
-    nombre_video = "Sistema_UAM.mp4"
-    
-    if os.path.isfile(nombre_video):
-        video_local = open(nombre_video, "rb")
-        st.video(video_local.read())
-    else:
-        st.error(f"⚠️ No se encontró el archivo '{nombre_video}' dentro de la carpeta. Asegúrate de copiarlo al lado de este código.")
+    # Enlace actualizado de YouTube
+    video_url = "https://youtu.be/S14FIITGbp0?si=tdB2F6qgpsBskefr"
+    st.video(video_url)
 
-# --- PESTAÑA 3: CRONOGRAMA ---
+# --- PESTAÑA 3: CRONOGRAMA COMPLETO (SEMANAS 1 A 12) ---
 with tab3:
-    st.header("Línea de Tiempo del Proyecto (4 Meses)")
-    cronograma_data = {
-        "Mes": ["Mes 1", "Mes 2", "Mes 3", "Mes 4"],
-        "Actividad Planeada": [
-            "Investigación y diseño de la base de datos.",
-            "Desarrollo del sistema.",
-            "Implementación de consultas y reportes.",
-            "Pruebas de base de datos y corrección de errores."
-        ]
+    st.header("📅 Calendario Completo del Proyecto")
+    st.write("Línea de tiempo oficial del trimestre. Las semanas 1 a 8 ocurrieron antes del lunes de ayer:")
+
+    # Base fija: Lunes de ayer (29 de Junio de 2026) es el inicio de la Semana 9
+    lunes_semana_9 = datetime(2026, 6, 29)
+    
+    # Función para calcular los rangos de fechas (Lunes a Viernes) hacia atrás y hacia adelante
+    def obtener_rango_semana(numero_semana):
+        diferencia_semanas = numero_semana - 9
+        inicio = lunes_semana_9 + timedelta(weeks=diferencia_semanas)
+        fin = inicio + timedelta(days=4) # De Lunes a Viernes
+        return f"{inicio.strftime('%d/%b')} al {fin.strftime('%d/%b')}"
+
+    # Lista de actividades reales para las 12 semanas de un proyecto de Base de Datos
+    actividades = [
+        "Definición del problema y requerimientos del control escolar.", # Sem 1
+        "Planteamiento de reglas de negocio y restricciones de la UAM.", # Sem 2
+        "Diseño del Modelo Entidad-Relación preliminar (Diagrama MER).", # Sem 3
+        "Revisión de llaves primarias, foráneas y relaciones complejas.", # Sem 4
+        "Proceso de Normalización de tablas (Evitar redundancia: 1FN, 2FN, 3FN).", # Sem 5
+        "Traducción del modelo conceptual al Modelo Relacional definitivo.", # Sem 6
+        "Elección del motor de BD e instalación del entorno local.", # Sem 7
+        "Escritura de scripts DDL (CREATE TABLE) y restricciones (CHECK, UNIQUE).", # Sem 8
+        "Puesta en marcha del servidor local y carga masiva de datos de prueba.", # Sem 9 (Ayer)
+        "Creación de Vistas, Triggers y asignación de Roles/Permisos de usuarios.", # Sem 10
+        "Pruebas de estrés de consultas complejas (Subconsultas y JOINs).", # Sem 11
+        "Optimización de índices, auditoría final y entrega del proyecto." # Sem 12
+    ]
+
+    # Determinar estados dinámicamente según tu lógica escolar
+    estados = []
+    for i in range(1, 13):
+        if i < 9:
+            estados.append("Completado ✅")
+        elif i == 9:
+            estados.append("En Curso 🛠️")
+        else:
+            estados.append("Pendiente ⏳")
+
+    # Armar el DataFrame con las 12 semanas completas
+    datos_cronograma = {
+        "Semana": [f"Semana {i}" for i in range(1, 13)],
+        "Fechas": [obtener_rango_semana(i) for i in range(1, 13)],
+        "Actividad / Hito del Proyecto": actividades,
+        "Estado": estados
     }
-    df_cronograma = pd.DataFrame(cronograma_data)
-    st.table(df_cronograma)
+    
+    df_cronograma = pd.DataFrame(datos_cronograma)
+
+    # Función de estilos CSS para pintar el calendario de colores pastel estilo App móvil
+    def asignar_colores_filas(row):
+        num_sem = int(row["Semana"].split(" ")[1])
+        if num_sem < 9:
+            # Semanas pasadas (1-8): Verde pastel suave indicando éxito
+            estilo = "background-color: #E8F5E9; color: #2E7D32;"
+        elif num_sem == 9:
+            # Semana actual (9): Amarillo/Naranja de atención con bordes notables
+            estilo = "background-color: #FFFDE7; color: #E65100; font-weight: bold; border: 2px solid #F57F17;"
+        else:
+            # Semanas futuras (10-12): Gris limpio de planificación
+            estilo = "background-color: #FAFAFA; color: #616161; font-style: italic;"
+        return [estilo] * len(row)
+
+    # Aplicar diseño
+    df_estilizado = df_cronograma.style.apply(asignar_colores_filas, axis=1)
+
+    # Renderizar la tabla interactiva adaptada al ancho del teléfono
+    st.dataframe(df_estilizado, use_container_width=True, hide_index=True)
 
 # --- PESTAÑA 4: CAJA DE COMENTARIOS ---
 with tab4:
@@ -65,7 +113,6 @@ with tab4:
     
     archivo_comentarios = "comentarios.csv"
     
-    # Formulario interactivo responsivo
     with st.form("formulario_feedback", clear_on_submit=True):
         nombre = st.text_input("Tu Nombre:")
         mejora = st.text_area("Propuesta de mejora para la plataforma:")
@@ -78,14 +125,12 @@ with tab4:
                 "Propuesta": [mejora]
             })
             
-            # Guardar comentario de forma local en formato CSV
             if not os.path.isfile(archivo_comentarios):
                 nuevo_comentario.to_csv(archivo_comentarios, index=False)
             else:
                 nuevo_comentario.to_csv(archivo_comentarios, mode='a', header=False, index=False)
             st.success("¡Gracias! Tu comentario ha sido guardado.")
 
-    # Mostrar el historial de comentarios guardados
     st.subheader("💬 Comentarios anteriores:")
     if os.path.isfile(archivo_comentarios):
         df_comentarios = pd.read_csv(archivo_comentarios)
